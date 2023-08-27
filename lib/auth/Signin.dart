@@ -10,6 +10,21 @@ class Signin extends StatefulWidget {
   State<Signin> createState() => SigninState();
 }
 
+showLoading(context) {
+  return showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: Text("Please Wait"),
+          content: Container(
+            height: 50,
+              child: Center(
+            child: CircularProgressIndicator(),
+          )),
+        );
+      });
+}
+
 class SigninState extends State<Signin> {
   var email, password;
   GlobalKey<FormState> formState = new GlobalKey();
@@ -18,6 +33,7 @@ class SigninState extends State<Signin> {
     if (formdata!.validate()) {
       formdata.save();
       try {
+        showLoading(context);
         final credential = await FirebaseAuth.instance
             .signInWithEmailAndPassword(email: email, password: password);
         // 👇 returns credtion if the log in was success
@@ -25,6 +41,7 @@ class SigninState extends State<Signin> {
       } on FirebaseAuthException catch (e) {
         // check if the user exist or not
         if (e.code == 'user-not-found') {
+          Navigator.of(context).pop();
           AwesomeDialog(
               dialogType: DialogType.error,
               animType: AnimType.bottomSlide,
@@ -38,6 +55,7 @@ class SigninState extends State<Signin> {
           print('No user found for that email.');
           // check if the password is correct or not
         } else if (e.code == 'wrong-password') {
+          Navigator.of(context).pop();
           AwesomeDialog(
               dialogType: DialogType.error,
               animType: AnimType.bottomSlide,
@@ -53,7 +71,7 @@ class SigninState extends State<Signin> {
       }
       print("Valid 👌");
     } else {
-      print("Not Valid 👉👌");
+      print("Not Valid 💀");
     }
   }
 
