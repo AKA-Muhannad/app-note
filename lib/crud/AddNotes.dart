@@ -107,7 +107,9 @@ class _AddNotesState extends State<AddNotes> {
                   height: 20,
                 ),
                 InkWell(
-                  onTap: () {},
+                  onTap: () {
+                    // Firebase 
+                  },
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
