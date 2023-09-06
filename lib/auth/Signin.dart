@@ -1,3 +1,4 @@
+import 'package:app_notes/components/alert.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -10,26 +11,11 @@ class Signin extends StatefulWidget {
   State<Signin> createState() => SigninState();
 }
 
-showLoading(context) {
-  return showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: Text("Please Wait"),
-          content: Container(
-            height: 50,
-              child: Center(
-            child: CircularProgressIndicator(),
-          )),
-        );
-      });
-}
-
 class SigninState extends State<Signin> {
   var email, password;
   GlobalKey<FormState> formState = new GlobalKey();
   Signin() async {
-    var formdata = formState.currentState;
+    FormState? formdata = formState.currentState;
     if (formdata!.validate()) {
       formdata.save();
       try {
