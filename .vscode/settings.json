@@ -1,3 +1,4 @@
 {
-    "python.analysis.typeCheckingMode": "off"
+    "python.analysis.typeCheckingMode": "off",
+    "cmake.sourceDirectory": "/Users/mohandalsoria/Documents/💻 Desktop Files/Flutter/app_notes/linux"
 }

@@ -1,3 +1,5 @@
+import 'package:app_notes/components/alert.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:awesome_dialog/awesome_dialog.dart';
@@ -12,7 +14,7 @@ class Signup extends StatefulWidget {
 
 class _SignupState extends State<Signup> {
   var username, email, password;
-
+  
   GlobalKey<FormState> formState = new GlobalKey();
 
   Signup() async {
@@ -20,6 +22,7 @@ class _SignupState extends State<Signup> {
     if (formdata!.validate()) {
       formdata.save();
       try {
+        showLoading(context);
         final credential =
             await FirebaseAuth.instance.createUserWithEmailAndPassword(
           email: email,
@@ -30,6 +33,7 @@ class _SignupState extends State<Signup> {
       } on FirebaseAuthException catch (e) {
         // check the weakness of the password
         if (e.code == 'weak-password') {
+          Navigator.of(context).pop();
           AwesomeDialog(
               context: context,
               title: "Error",
@@ -39,10 +43,14 @@ class _SignupState extends State<Signup> {
 
           // check the email is exist or not
         } else if (e.code == 'email-already-in-use') {
+          Navigator.of(context).pop();
           AwesomeDialog(
               context: context,
               title: "Error",
-              body: Text("The account already exists for that email 🫢", style: TextStyle(fontSize: 15),))
+              body: Text(
+                "The account already exists for that email 🫢",
+                style: TextStyle(fontSize: 15),
+              ))
             ..show();
           print('The account already exists for that email.');
         }
@@ -51,7 +59,7 @@ class _SignupState extends State<Signup> {
       }
       print("Valid 👌");
     } else {
-      print("Not Valid 👉👌");
+      print("Not Valid 💀");
     }
   }
 
@@ -139,37 +147,41 @@ class _SignupState extends State<Signup> {
                             borderSide: BorderSide(width: 1.5),
                           )),
                     ),
-                    SizedBox(height: 1.5,),
+                    SizedBox(
+                      height: 1.5,
+                    ),
                     Container(
                       padding: EdgeInsets.all(10),
                       child: Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                        Text(
-                          "If you have account ",
-                          style: GoogleFonts.ibmPlexSansArabic(
-                            textStyle: TextStyle(
-                                fontWeight: FontWeight.w500,
-                                fontSize: 15),
-                          ),
-                        ),
-                        InkWell(
-                          onTap: () {
-                            Navigator.of(context).pushReplacementNamed("signin");
-                          },
-                          child: Text(
-                            " 👉 Log in",
-                            style: GoogleFonts.ibmPlexSansArabic(
-                              textStyle: TextStyle(
-                                  color: Colors.blue,
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 15),
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              "If you have account ",
+                              style: GoogleFonts.ibmPlexSansArabic(
+                                textStyle: TextStyle(
+                                    fontWeight: FontWeight.w500, fontSize: 15),
+                              ),
                             ),
-                          ),
-                        ),
-                      ]),
+                            InkWell(
+                              onTap: () {
+                                Navigator.of(context)
+                                    .pushReplacementNamed("signin");
+                              },
+                              child: Text(
+                                " 👉 Log in",
+                                style: GoogleFonts.ibmPlexSansArabic(
+                                  textStyle: TextStyle(
+                                      color: Colors.blue,
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 15),
+                                ),
+                              ),
+                            ),
+                          ]),
                     ),
-                    SizedBox(height: 10,),
+                    SizedBox(
+                      height: 10,
+                    ),
                     Container(
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
@@ -180,9 +192,15 @@ class _SignupState extends State<Signup> {
                           var response = await Signup();
                           print("-------------");
                           // 👇 condtion below means the sign up is success
-                          if(response != null){
+                          if (response != null) {
+                            await FirebaseFirestore.instance
+                                .collection("users")
+                                .add({
+                              "username": username,
+                              "email": email,
+                            });
                             Navigator.of(context).pushReplacementNamed("home");
-                          }else{
+                          } else {
                             print("Failed !!");
                           }
                           print(response);
@@ -191,9 +209,7 @@ class _SignupState extends State<Signup> {
                           "Create account",
                           style: GoogleFonts.ibmPlexSansArabic(
                             textStyle: TextStyle(
-                                fontSize: 18,
-                                wordSpacing: 2,
-                                letterSpacing: 1),
+                                fontSize: 18, wordSpacing: 2, letterSpacing: 1),
                           ),
                           // ***** 👇 below is a code that it can be done *****
                           // style: Theme.of(context).textTheme.labelLarge,
